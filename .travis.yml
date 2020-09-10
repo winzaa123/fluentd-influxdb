@@ -1,0 +1,23 @@
+sudo: required
+
+services:
+  - docker
+env:
+  global:
+    - IMAGE_NAME=fluentd-influxdb
+  
+language: bash
+
+
+before_script:
+  - docker -v
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - docker images
+  - docker pull $IMAGE_NAME:latest || true
+
+after_script:
+  - docker images
+
+script: 
+  - docker build --cache-from ${DOCKER_USERNAME}/${IMAGE_NAME}:latest  -t ${DOCKER_USERNAME}/${IMAGE_NAME}:latest  .
+  - docker push ${DOCKER_USERNAME}/${IMAGE_NAME}:latest
